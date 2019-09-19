@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -51,7 +53,7 @@ public class UserController {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             )
-    public ResponseEntity<UserDetails> createUser(@RequestBody UserDetailsRequestModel userDetailsRequestModel) {
+    public ResponseEntity<UserDetails> createUser(@Valid @RequestBody UserDetailsRequestModel userDetailsRequestModel) {
         UserDetails userDetails1 = new UserDetails();
         userDetails1.setUserName(userDetailsRequestModel.getFirstName());
         userDetails1.setUserLastName(userDetailsRequestModel.getLastName());
