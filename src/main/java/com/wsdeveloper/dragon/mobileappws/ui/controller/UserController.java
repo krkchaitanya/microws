@@ -1,7 +1,7 @@
 package com.wsdeveloper.dragon.mobileappws.ui.controller;
 
-import com.wsdeveloper.dragon.mobileappws.ui.modelResponses.UserDetails;
 import com.wsdeveloper.dragon.mobileappws.ui.modelRequests.UserDetailsRequestModel;
+import com.wsdeveloper.dragon.mobileappws.ui.modelResponses.UserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,11 +9,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
+    HashMap<String, UserDetails> users = null;
     @GetMapping(path="/defaultUserInf")
     public String defaultUserInf() {
         return "We are hitting the defalut route";
@@ -25,17 +28,15 @@ public class UserController {
 	}
 
 	@GetMapping(path="/{userID}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public UserDetails getUserDetailsObj(@PathVariable String userID)
+	public ResponseEntity<UserDetails> getUserDetailsObj(@PathVariable String userID)
     {
-        UserDetails userDetails = new UserDetails();
+        UserDetails userDetailsHH = new UserDetails();
 		if (!StringUtils.isEmpty(userID)) {
-            userDetails.setUserEmail("nancyWheeler221@gmail.com");
-            userDetails.setUserName("nancy wheeler");
-            userDetails.setUserLastName("blake");
-            userDetails.setUserPassword("23lrandom");
+            return new ResponseEntity<UserDetails>(users.get(userID), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<UserDetails>(userDetailsHH, HttpStatus.OK);
         }
-        return userDetails;
-	}
+	};
 
 	@GetMapping(path="/profession")
     public ResponseEntity getUserProfessionInf(@RequestParam(value="userId", defaultValue = "3344", required = false)String userId) {
@@ -59,6 +60,13 @@ public class UserController {
         userDetails1.setUserLastName(userDetailsRequestModel.getLastName());
         userDetails1.setUserEmail(userDetailsRequestModel.getEmail());
         userDetails1.setUserPassword(userDetailsRequestModel.getPassword());
+
+        String userId = UUID.randomUUID().toString();
+        userDetails1.setUserId(userId);
+
+        if(users == null) users = new HashMap<String, UserDetails>();
+        users.put(userId, userDetails1);
+
         return new ResponseEntity<UserDetails>(userDetails1, HttpStatus.OK);
     }
 
