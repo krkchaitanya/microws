@@ -9,14 +9,28 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    HashMap<String, UserDetails> users = null;
+    private HashMap<String, UserDetails> users = new HashMap<>();
+
+    @GetMapping(path = "/alluserslist")
+    public List<UserDetails> getAllUsers() {
+        List<UserDetails> userslt = users.values().stream().collect(Collectors.toList());
+        if (!userslt.isEmpty() || userslt == null) {
+            return userslt;
+        } else {
+          return Collections.emptyList();
+        }
+    };
+
     @GetMapping(path="/defaultUserInf")
     public String defaultUserInf() {
         return "We are hitting the defalut route";
@@ -70,9 +84,20 @@ public class UserController {
         return new ResponseEntity<UserDetails>(userDetails1, HttpStatus.OK);
     }
 
-	@PutMapping
-	public String updateUser() {
-		return "update user was called";
+	@PutMapping(path="/updateUserDetails")
+	public UserDetails updateUser(@RequestBody UserDetailsRequestModel userDtlsRqstmodel) {
+	    String userid = userDtlsRqstmodel.getUserid();
+	    System.out.println("--Updating the user: " + userid);
+	    if (!StringUtils.isEmpty(userid) && userid != null && users.containsKey(userid)) {
+            users.get(userid).setUserEmail(userDtlsRqstmodel.getEmail());
+            users.get(userid).setUserName(userDtlsRqstmodel.getFirstName());
+            users.get(userid).setUserLastName(userDtlsRqstmodel.getLastName());
+            users.get(userid).setUserPassword(userDtlsRqstmodel.getPassword());
+            return users.get(userid);
+        } else {
+            System.out.println("--User details update operation failed --");
+	        return new UserDetails();
+        }
 	}
 	
 	@DeleteMapping
