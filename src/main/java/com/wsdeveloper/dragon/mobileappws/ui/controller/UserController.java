@@ -9,10 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -100,8 +97,17 @@ public class UserController {
         }
 	}
 	
-	@DeleteMapping
-	public String deleteUser() {
-		return "Delete user was called";
-	}
+	@DeleteMapping(path = "/deleteuser/{id}")
+	public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        System.out.println("--Deleting the user with id : " + id);
+        List<UserDetails> filteredUsersList = users.values().stream().filter(ele -> ele.getUserId().equalsIgnoreCase(id)).collect(Collectors.toList());
+
+		if (!StringUtils.isEmpty(id) && id != null && !filteredUsersList.isEmpty() && filteredUsersList != null) {
+            users.remove(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            System.out.println(" --Please verify the userid-- ");
+            return ResponseEntity.badRequest().build();
+        }
+	};
 }
